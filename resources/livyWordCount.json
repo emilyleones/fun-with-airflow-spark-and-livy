@@ -1,0 +1,9 @@
+{
+  "className": "thoughtworks.wordcount.WordCount",
+  "name": "Word Count Livy",
+  "file": "/data/resources/tw-pipeline_2.11-0.1.0-SNAPSHOT.jar",
+  "args": [
+    "/data/resources/words.txt",
+    "/data/resources/output/"
+  ]
+}

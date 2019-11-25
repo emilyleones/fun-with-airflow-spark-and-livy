@@ -1,16 +1,21 @@
 version: '2.1'
 services:
   spark-master:
-    image: dhruvk/spark-master-livy:2.4
+    image: dhruvk/spark-master-livy:2.4.4-hadoop2.7
     container_name: spark-master
     ports:
       - "8080:8080"
+      - "8081:8081"
       - "7077:7077"
       - "8998:8998"
     tty: true
     environment:
       - INIT_DAEMON_STEP=setup_spark
+      - LIVY_CONF_DIR=/config/livy
       - "constraint:node==<yourmasternode>"
+    volumes:
+      - ${HOME}/TWDU/fun-with-airflow-spark-and-livy/resources:/data/resources
+      - ${HOME}/TWDU/fun-with-airflow-spark-and-livy/livy:/config/livy
 
   spark-worker-1:
     image: bde2020/spark-worker:2.4.4-hadoop2.7
@@ -18,10 +23,13 @@ services:
     depends_on:
       - spark-master
     ports:
-      - "8081:8081"
+      - "8085:8081"
     environment:
       - "SPARK_MASTER=spark://spark-master:7077"
       - "constraint:node==<yourworkernode>"
+    volumes:
+      - ${HOME}/TWDU/fun-with-airflow-spark-and-livy/resources:/data/resources
+      - ${HOME}/TWDU/fun-with-airflow-spark-and-livy/livy:/config/livy
 
   spark-worker-2:
     image: bde2020/spark-worker:2.4.4-hadoop2.7
@@ -32,13 +40,16 @@ services:
       - "8082:8081"
     environment:
       - "SPARK_MASTER=spark://spark-master:7077"
-      - "constraint:node==<yourworkernode>" 
+      - "constraint:node==<yourworkernode>"
+    volumes:
+      - ${HOME}/TWDU/fun-with-airflow-spark-and-livy/resources:/data/resources
+      - ${HOME}/TWDU/fun-with-airflow-spark-and-livy/livy:/config/livy
 
   postgres:
     container_name: "postgres"
     image: postgres:9.6
     volumes:
-      - ${HOME}/postgres_mount/postgres:/var/lib/postgresql/data        
+      - ${HOME}/postgres_mount/postgres:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=airflow
       - POSTGRES_PASSWORD=airflow
